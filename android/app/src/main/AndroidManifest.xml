@@ -8,7 +8,7 @@
          FlutterApplication and put your custom class here. -->
     <application
         android:name="io.flutter.app.FlutterApplication"
-        android:label="single_product_sale_app"
+        android:label="EZSale"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
