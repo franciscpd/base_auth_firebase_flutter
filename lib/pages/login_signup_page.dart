@@ -111,19 +111,8 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
       body: Stack(
         children: <Widget>[
           _showBody(),
-          _showCircularProgress(),
         ],
       ),
-    );
-  }
-
-  Widget _showCircularProgress() {
-    if (_isLoading) {
-      return Center(child: CircularProgressIndicator());
-    }
-    return Container(
-      height: 0.0,
-      width: 0.0,
     );
   }
 
@@ -267,15 +256,19 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
           color: Colors.blue,
-          child: _formMode == FormMode.SIGNIN
-              ? Text(
-                  'Login',
-                  style: TextStyle(fontSize: 20, color: Colors.white),
+          child: _isLoading
+              ? CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                 )
-              : Text(
-                  'Create account',
-                  style: TextStyle(fontSize: 20, color: Colors.white),
-                ),
+              : _formMode == FormMode.SIGNIN
+                  ? Text(
+                      'Login',
+                      style: TextStyle(fontSize: 20, color: Colors.white),
+                    )
+                  : Text(
+                      'Create account',
+                      style: TextStyle(fontSize: 20, color: Colors.white),
+                    ),
           onPressed: _validateAndSubmit,
         ),
       ),
