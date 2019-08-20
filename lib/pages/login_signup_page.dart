@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:single_product_sale_app/services/authentication.dart';
 
 class LoginSignUpPage extends StatefulWidget {
-  LoginSignUpPage({ this.auth, this.onSignedIn });
+  LoginSignUpPage({this.auth, this.onSignedIn});
 
   final BaseAuth auth;
   final VoidCallback onSignedIn;
@@ -46,22 +46,21 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
       try {
         if (_formMode == FormMode.SIGNIN) {
           userId = await widget.auth.signIn(_email, _password);
-          print('Signed in: $userId');
         } else {
           userId = await widget.auth.signUp(_email, _password);
           widget.auth.sendEmailVerification();
           _showVerifyEmailSentDialog();
-          print('Signed up user: $userId');
         }
         setState(() {
-          _isLoading= false;
+          _isLoading = false;
         });
 
-        if (userId.length > 0 && userId != null && _formMode == FormMode.SIGNIN) {
+        if (userId.length > 0 &&
+            userId != null &&
+            _formMode == FormMode.SIGNIN) {
           widget.onSignedIn();
         }
       } catch (e) {
-        print('Error: $e');
         setState(() {
           _isLoading = false;
           if (_isIos) {
@@ -71,6 +70,10 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
           }
         });
       }
+    } else {
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -118,28 +121,30 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
     if (_isLoading) {
       return Center(child: CircularProgressIndicator());
     }
-    return Container(height: 0.0, width: 0.0,);
+    return Container(
+      height: 0.0,
+      width: 0.0,
+    );
   }
 
   void _showVerifyEmailSentDialog() {
     showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Verify your account'),
-          content: Text('Link to verify account has been sent to your email'),
-          actions: <Widget>[
-            FlatButton(
-              child: Text("Dismiss"),
-              onPressed: () {
-                _changeFormToSignIn();
-                Navigator.of(context).pop();
-              },
-            )
-          ],
-        );
-      }
-    );
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Verify your account'),
+            content: Text('Link to verify account has been sent to your email'),
+            actions: <Widget>[
+              FlatButton(
+                child: Text("Dismiss"),
+                onPressed: () {
+                  _changeFormToSignIn();
+                  Navigator.of(context).pop();
+                },
+              )
+            ],
+          );
+        });
   }
 
   Widget _showBody() {
@@ -201,12 +206,19 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
         autofocus: false,
         decoration: InputDecoration(
           hintText: 'Email',
-          icon: Icon(
-            Icons.mail,
-            color: Colors.grey
-          ),
+          icon: Icon(Icons.mail, color: Colors.grey),
         ),
-        validator: (value) => value.isEmpty ? 'Email can\'t be empty' : null,
+        validator: (value) {
+          Pattern emailPattern =
+              r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
+          RegExp regex = new RegExp(emailPattern);
+
+          if (!regex.hasMatch(value)) {
+            return 'Enter valid email';
+          }
+
+          return null;
+        },
         onSaved: (value) => _email = value.trim(),
       ),
     );
@@ -235,17 +247,13 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
   Widget _showSecondaryButton() {
     return new FlatButton(
       child: _formMode == FormMode.SIGNIN
-        ? Text(
-          'Create an account',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w300)
-        )
-        : Text(
-          'Have an account? Sign in',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w300)
-        ),
+          ? Text('Create an account',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w300))
+          : Text('Have an account? Sign in',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w300)),
       onPressed: _formMode == FormMode.SIGNIN
-        ? _changeFormToSignUp
-        : _changeFormToSignIn,
+          ? _changeFormToSignUp
+          : _changeFormToSignIn,
     );
   }
 
@@ -256,17 +264,18 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
         height: 40,
         child: RaisedButton(
           elevation: 5,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
           color: Colors.blue,
           child: _formMode == FormMode.SIGNIN
-            ? Text(
-              'Login',
-              style: TextStyle(fontSize: 20, color: Colors.white),
-            )
-            : Text(
-              'Create account',
-              style: TextStyle(fontSize: 20, color: Colors.white),
-            ),
+              ? Text(
+                  'Login',
+                  style: TextStyle(fontSize: 20, color: Colors.white),
+                )
+              : Text(
+                  'Create account',
+                  style: TextStyle(fontSize: 20, color: Colors.white),
+                ),
           onPressed: _validateAndSubmit,
         ),
       ),
