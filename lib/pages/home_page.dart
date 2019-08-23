@@ -1,111 +1,84 @@
 import 'package:flutter/material.dart';
-import 'package:single_product_sale_app/services/authentication.dart';
+import 'package:scoped_model/scoped_model.dart';
+import 'package:flutter/cupertino.dart' show CupertinoIcons;
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+
+import 'package:ezsale/core/app_model.dart';
+import 'package:ezsale/core/pages/drawer_page.dart';
+import 'package:ezsale/core/pages/profile_page.dart';
 
 class HomePage extends StatefulWidget {
-  HomePage({Key key, this.auth, this.userId, this.onSignedOut}): super(key: key);
-
-  final BaseAuth auth;
-  final VoidCallback onSignedOut;
-  final String userId;
-
   @override
-  State<StatefulWidget> createState() => new _HomePageState();
+  State<StatefulWidget> createState() => HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
-  bool _isEmailVerified = false;
-
-  @override
-  void initState() {
-    super.initState();
-
-    _checkEmailVerification();
-  }
-
-  void _checkEmailVerification() async {
-    _isEmailVerified = await widget.auth.isEmailVerified();
-
-    if (!_isEmailVerified) {
-      _showVerifyEmailDialog();
-    }
-  }
-
-  void _resentVerifyEmail() {
-    widget.auth..sendEmailVerification();
-    _showVerifyEmailSentDialog();
-  }
-
-  void _showVerifyEmailDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        // return object of type Dialog
-        return new AlertDialog(
-          title: Text("Verify your account"),
-          content: Text("Please verify account in the link sent to email"),
-          actions: <Widget>[
-            FlatButton(
-              child: Text("Resent link"),
-              onPressed: () {
-                Navigator.of(context).pop();
-                _resentVerifyEmail();
-              },
+class HomePageState extends State<HomePage> {
+  Widget _buildBody(AppModel model) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: new Center(
+        child: Column(
+          children: <Widget>[
+            Text('Home page'),
+            Padding(
+              padding: EdgeInsets.all(8.0),
+              child: PlatformButton(
+                child: Text('Sign Out'),
+                onPressed: () async => await model.authService.signOut(),
+              ),
             ),
-            FlatButton(
-              child: Text("Dismiss"),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
+            Padding(
+              padding: EdgeInsets.all(8.0),
+              child: PlatformButton(
+                child: Text('Switch Platform'),
+                onPressed: () {
+                  setState(() {
+                    if (isCupertino) {
+                      changeToMaterialPlatform();
+                    } else if (isMaterial) {
+                      changeToCupertinoPlatform();
+                    }
+                  });
+                },
+              ),
             ),
           ],
-        );
-      },
+        ),
+      ),
     );
-  }
-
-  void _showVerifyEmailSentDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        // return object of type Dialog
-        return new AlertDialog(
-          title: Text("Verify your account"),
-          content: Text("Link to verify account has been sent to your email"),
-          actions: <Widget>[
-            FlatButton(
-              child: Text("Dismiss"),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  _signOut() async {
-    try {
-      await widget.auth.signOut();
-      widget.onSignedOut();
-    } catch (e) {
-      print(e);
-    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
-        appBar: AppBar(
-          title: Text('Single page sale'),
-          actions: <Widget>[
-            FlatButton(
-                child: Text('Logout',
-                    style: TextStyle(fontSize: 17.0, color: Colors.white)),
-                onPressed: _signOut)
-          ],
-        ),
-        body: Container(),
+    return ScopedModelDescendant<AppModel>(
+      rebuildOnChange: false,
+      builder: (_, child, model) {
+        return PlatformScaffold(
+          android: (_) => MaterialScaffoldData(
+            drawer: new Drawer(child: new DrawerPage()),
+          ),
+          appBar: PlatformAppBar(
+            title: Text('EZSale'),
+            ios: (_) => CupertinoNavigationBarData(
+              leading: PlatformIconButton(
+                iosIcon: Icon(CupertinoIcons.info),
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => Material(
+                      child: ProfilePage(),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          body: Material(
+            color: isMaterial ? null : Theme.of(context).cardColor,
+            child: _buildBody(model),
+          ),
+        );
+      },
     );
   }
 }

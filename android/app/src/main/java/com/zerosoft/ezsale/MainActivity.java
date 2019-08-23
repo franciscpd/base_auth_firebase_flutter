@@ -1,4 +1,4 @@
-package com.zerosoft.single_product_sale_app;
+package com.zerosoft.ezsale;
 
 import android.os.Bundle;
 import io.flutter.app.FlutterActivity;

@@ -1,4 +1,4 @@
-name: single_product_sale_app
+name: ezsale
 description: A new Flutter project.
 
 # The following defines the version and build number for your application.
@@ -26,6 +26,14 @@ dependencies:
   google_sign_in: ^4.0.0
   firebase_core: ^0.4.0+8
   firebase_auth: ^0.14.0+2
+  scoped_model: ^1.0.1
+  flutter_auth_base: ^0.3.1
+  flutter_platform_widgets: ^0.12.0
+  url_launcher: ^5.1.2
+  async_loader: ^0.1.2
+  font_awesome_flutter: ^8.5.0
+  flutter_facebook_login: ^2.0.1
+  crypto: ^2.1.2
 
 dev_dependencies:
   flutter_test:
